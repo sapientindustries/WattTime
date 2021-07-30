@@ -1,5 +1,7 @@
+import io
 import requests
 import base64
+import zipfile
 from json import JSONDecodeError
 
 
@@ -32,16 +34,16 @@ class WattTime:
             raise
         return self.token
 
-    def submit_get_request(self, url):
+    def submit_get_request(self, url, stream=False):
         if self.token:
-            req = requests.get(url, headers=self.headers)
+            req = requests.get(url, headers=self.headers, stream=stream)
             return req
 
         else:
             self.get_token()
 
         if self.token:
-            req = requests.get(url, headers=self.headers)
+            req = requests.get(url, headers=self.headers, stream=stream)
             return req
 
         raise('Tried to get_token() and received nothing or error.')
@@ -104,11 +106,12 @@ class WattTime:
         req_url = f'https://api2.watttime.org/v2/index/?ba={self.balancing_authority}&style={style}'
         print(f"URL requested = {req_url}")
         req = self.submit_get_request(req_url)
-        data = req.json()
+        data = req
         print(data)
         return data
 
-    def get_historical_emissions_zip(self, version='all', **kwargs):
+    def get_historical_emissions_zip(self, version='all', path='/tmp', **kwargs):
+        chunk_size = 128
 
         # Potentially being passed in by user as parameters
         ba = kwargs.get('ba')
@@ -121,9 +124,11 @@ class WattTime:
         print(f'Getting data for balancing authority: {self.balancing_authority}')
         req_url = f'https://api2.watttime.org/v2/historical/?ba={self.balancing_authority}&version={version}'
         print(f"URL requested = {req_url}")
-        req = self.submit_get_request(req_url)
-        data = req.json()
-        return data  # Not sure what this response looks like
+        r = self.submit_get_request(req_url)
+        with open(path + '/historic.zip', 'wb') as fd:
+            for chunk in r.iter_content(chunk_size=chunk_size):
+                fd.write(chunk)
+        return path
 
     def get_detailed_grid_data(self, starttime, endtime, style='all', **kwargs):
 
