@@ -110,11 +110,8 @@ class WattTime:
         print(data)
         return data
 
-    def get_historical_emissions_zip(self, version='all', path='/tmp', **kwargs):
+    def get_historical_emissions_zip(self, ba=None, version='all', path='/tmp', **kwargs):
         chunk_size = 128
-
-        # Potentially being passed in by user as parameters
-        ba = kwargs.get('ba')
 
         kw_handling = self.handle_balancing_authority(ba=ba)
 
