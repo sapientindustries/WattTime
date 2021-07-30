@@ -122,7 +122,7 @@ class WattTime:
             raise ('Error with kwarg handling, ensure these are appropriate')
 
         print(f'Getting data for balancing authority: {self.balancing_authority}')
-        req_url = f'https://api2.watttime.org/v2/historical/?ba={self.balancing_authority}&version={version}'
+        req_url = f'https://api2.watttime.org/v2/historical/?ba={self.balancing_authority}&version=all'
         print(f"URL requested = {req_url}")
         r = self.submit_get_request(req_url)
         with open(path + '/historic.zip', 'wb') as fd:
