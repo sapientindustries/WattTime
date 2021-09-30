@@ -45,3 +45,9 @@ def test_get_detailed_grid_data():
         raise('Error: market not returned, check free tier for ba')
 
     assert(market == 'RTM')
+
+def test_get_forecast_data():
+    w = WattTime('user', 'password')
+    resp = w.get_forecast(ba='CAISO_ZP26')
+    data = resp.json().get('forecast')
+    assert(data is not None)

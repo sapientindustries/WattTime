@@ -102,12 +102,32 @@ class WattTime:
         if not kw_handling:
             raise('Error with kwarg handling, ensure these are appropriate')
 
-        print(f'Getting data for balancing authority: {self.balancing_authority}')
         req_url = f'https://api2.watttime.org/v2/index/?ba={self.balancing_authority}&style={style}'
-        print(f"URL requested = {req_url}")
         req = self.submit_get_request(req_url)
         data = req
-        print(data)
+
+        return data
+
+    def get_forecast(self, **kwargs):
+
+        # Potentially being passed in by user as parameters
+        starttime = kwargs.get('starttime')
+        longitude = kwargs.get('endtime')
+        ba = kwargs.get('ba')
+
+        kw_handling = self.handle_balancing_authority(ba=ba)
+
+        if not ba:
+            raise('Error with kwarg handling, ensure these are appropriate. Missing kwarg [ba]')
+
+        req_url = f'https://api2.watttime.org/v2/forecast/?ba={ba}'
+
+        if starttime and endtime:
+            req_url = f'https://api2.watttime.org/v2/forecast/?ba={ba}&startime={starttime}&endtime={endtime}'
+
+        req = self.submit_get_request(req_url)
+        data = req
+
         return data
 
     def get_historical_emissions_zip(self, ba=None, version='all', path='/tmp', **kwargs):
